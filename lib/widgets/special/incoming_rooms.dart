@@ -4,12 +4,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:multiplayer_demo/extensions/exte_paths.dart';
 import 'package:multiplayer_demo/functions/common/debugLog.dart';
+import 'package:multiplayer_demo/functions/common/navigateWithTransition.dart';
 import 'package:multiplayer_demo/functions/special/add_game_room.dart';
 import 'package:multiplayer_demo/functions/special/is_valid_currentuser.dart';
 import 'package:multiplayer_demo/functions/special/updatePlayerStatus.dart';
 import 'package:multiplayer_demo/models/game_room.dart';
 import 'package:multiplayer_demo/models/group_model.dart';
 import 'package:multiplayer_demo/models/playerinroom.dart';
+import 'package:multiplayer_demo/screens/game_page.dart';
 import 'package:multiplayer_demo/specials/enums.dart';
 import 'package:multiplayer_demo/widgets/TextWithFontWidget.dart';
 
@@ -48,14 +50,18 @@ class _IncomingRoomsWidgetState extends State<IncomingRoomsWidget> {
                     .onValue
                     .map((event) {
                   try {
-                    gameRoom = GameRoom.fromMap(event.snapshot.value as Map);
-                    if (gameRoom != null) {
-                      int indexwher =
-                          gameRoom!.players.indexWhere((e) => e.uid == validId);
-                      if (indexwher >= 0) {
-                        playerInRoom = gameRoom!.players[indexwher];
+                    Map? map = event.snapshot.value as Map?;
+                    if (map != null) {
+                      gameRoom = GameRoom.fromMap(map);
+                      if (gameRoom != null) {
+                        int indexwher = gameRoom!.players
+                            .indexWhere((e) => e.uid == validId);
+                        if (indexwher >= 0) {
+                          playerInRoom = gameRoom!.players[indexwher];
+                        }
                       }
                     }
+
                     // dblog("gameRoom no err ${gameRoom != null}");
                   } catch (e) {
                     dblog("gameRoom err $e");
@@ -72,10 +78,12 @@ class _IncomingRoomsWidgetState extends State<IncomingRoomsWidget> {
                           children: [
                             if (gameRoom != null)
                               TextWithFontWidget(
-                                  text:
-                                      gameRoom!.gamename.toString() + " name"),
+                                      text: gameRoom!.gamename.toString() +
+                                          " name ")
+                                  .paddingWidget(),
                             TextWithFontWidget(
-                                text: playerInRoom.playerInRoomStatus),
+                                    text: playerInRoom.playerInRoomStatus)
+                                .paddingWidget(),
                             if (playerInRoom.playerInRoomStatus ==
                                     PlayerInRoomStatus.leaved.name &&
                                 gameRoom != null)
@@ -88,10 +96,20 @@ class _IncomingRoomsWidgetState extends State<IncomingRoomsWidget> {
                                           playerInRoomStatus:
                                               PlayerInRoomStatus.joined.name);
                                 }
-
                                 await addOrUpdateGameRoom(
                                   gameRoom!,
                                 );
+                              }).paddingWidget(),
+                            if (playerInRoom.playerInRoomStatus ==
+                                    PlayerInRoomStatus.joined.name &&
+                                gameRoom != null)
+                              "Play Game".roundButton(onTap: () {
+                                navigateWithTransitionToScreen(
+                                    context,
+                                    GamePage(
+                                        gameRoom: gameRoom!,
+                                        // playerInRoom: playerInRoom
+                                        ));
                               }).paddingWidget()
                           ],
                         ),

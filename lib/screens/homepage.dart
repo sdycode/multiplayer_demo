@@ -17,13 +17,14 @@ import 'package:multiplayer_demo/sheets/group_creation_sheet.dart';
 import 'package:multiplayer_demo/sheets/initialise_gameroom_sheet.dart';
 import 'package:multiplayer_demo/specials/enums.dart';
 import 'package:multiplayer_demo/widgets/TextWithFontWidget.dart';
+import 'package:multiplayer_demo/widgets/special/Multiplyer_Game_button.dart';
 import 'package:multiplayer_demo/widgets/special/get_location.dart';
 import 'package:multiplayer_demo/widgets/special/gruop_list_widget.dart';
 import 'package:multiplayer_demo/widgets/special/incoming_rooms.dart';
 import 'package:multiplayer_demo/widgets/special/request_came_list.dart';
 import 'package:multiplayer_demo/widgets/special/userslist.dart';
 
-Widget get homePage => const HomePage();
+
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -46,6 +47,7 @@ class _HomePageState extends State<HomePage> {
   TextEditingController groupNameController = TextEditingController();
   @override
   Widget build(BuildContext context) {
+    
     getGroups();
     return WillPopScope(
       onWillPop: () async {
@@ -63,22 +65,7 @@ class _HomePageState extends State<HomePage> {
             IncomingRoomsWidget()
                 .paddingWidget()
                 .addAbove(widget: TextWithFontWidget(text: "Incoming rooms")),
-            "Multiplyer Game".roundButton(onTap: () async {
-              String roomId =
-                  "${validId}_${DateTime.now().millisecondsSinceEpoch}";
-              GameRoom gameRoom = GameRoom(
-                roomId: roomId,
-                adminUid: validId,
-                minPplayers: 2,
-                maxPlayers: 4,
-                players: [
-                  PlayerInRoom(
-                      uid: validId,
-                      playerInRoomStatus: PlayerInRoomStatus.joined.name)
-                ],
-              );
-              await initialiseGameRoomSheet(context, gameRoom);
-            }).paddingWidget(),
+            MulitplayerGameButton(),
             "Create Group".roundButton(onTap: () async {
               await openGroupCreationSheet(context, groupNameController);
             }).paddingWidget(),

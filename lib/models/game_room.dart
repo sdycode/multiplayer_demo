@@ -74,7 +74,7 @@ class GameRoom {
   String toJson() => json.encode(toMap());
 
   factory GameRoom.fromJson(String source) =>
-      GameRoom.fromMap(json.decode(source) as Map<String, dynamic>);
+      GameRoom.fromMap(json.decode(source) as Map);
 
   @override
   String toString() {

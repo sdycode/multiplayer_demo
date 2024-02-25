@@ -18,7 +18,7 @@ List<BasicUserInfoModel> getRequestUsersInfoFronUIDs(List<String> uids) {
   return infos;
 }
 
-resetUserInfoMapFromUID(List<BasicUserInfoModel> list, {String? where}) async {
+resetUserInfoMapFromUID(List<BasicUserInfoModel> list, {String? where})  {
   for (var e in list) {
     allBasicInfoMap[e.uid] = e;
   }

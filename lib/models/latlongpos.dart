@@ -2,9 +2,9 @@
 import 'dart:convert';
 
 class LatLongPos {
-  double lat;
-  double long;
-  LatLongPos({
+  final double lat;
+  final double long;
+ const LatLongPos({
     required this.lat,
     required this.long,
   });
@@ -28,8 +28,8 @@ class LatLongPos {
 
   factory LatLongPos.fromMap(Map map) {
     return LatLongPos(
-      lat: map['lat'] as double,
-      long: map['long'] as double,
+      lat: (map['lat'] as num).toDouble(),
+      long: (map['long'] as num).toDouble(),
     );
   }
 

@@ -53,10 +53,11 @@ Future<bool> removeMemberFromGroupModel(
 Future<GroupModel?> getGroupInfo({required String groupId}) async {
   final ref = FirebaseDatabase.instance.ref().child("groups").child(groupId);
   Map? map = (await ref.once()).snapshot.value as Map?;
-  dblog("getGroups map info ${map!.entries.length}");
   try {
-    GroupModel groupModel = GroupModel.fromMap(map);
-    return groupModel;
+    if (map != null) {
+      GroupModel groupModel = GroupModel.fromMap(map!);
+      return groupModel;
+    }
   } catch (e) {
     dblog("getGroups map err ${e}");
   }
@@ -79,7 +80,7 @@ Future<List<GroupModel>> getGroups({String? memberUid}) async {
   }
 
   String uid = memberUid ?? validUser.uid;
-  dblog("getGroups $uid");
+  // dblog("getGroups $uid");
   final ref =
       FirebaseDatabase.instance.ref().child("groupidlist_of_user").child(uid);
   DatabaseEvent event = await ref.once();

@@ -23,11 +23,16 @@ class DeviceLocation {
   }
 
   getAndSetCurrentPosition() async {
-    Position? position = await getCurrentPosition();
-    dblog("latlongpos $position");
-    if (position != null) {
-      currentPosition =
-          LatLongPos(lat: position.latitude, long: position.longitude);
+    try {
+      dblog("latlongpos is before ");
+      Position? position = await getCurrentPosition();
+      dblog("latlongpos is null ${position == null}");
+      if (position != null) {
+        currentPosition =
+            LatLongPos(lat: position.latitude, long: position.longitude);
+      }
+    } catch (e) {
+      dblog("err latlongpos $e");
     }
   }
 
@@ -50,9 +55,16 @@ class DeviceLocation {
     }
     dblog("permi $hasPermission");
     try {
+      dblog(
+          "permi pos ber ${await GeolocatorPlatform.instance.getCurrentPosition(locationSettings: LocationSettings())}");
+
       final position = await _geolocatorPlatform.getCurrentPosition();
+      dblog("permi $position");
+
       return position;
-    } catch (e) {}
+    } catch (e) {
+      dblog("permi pos err$e");
+    }
     return null;
   }
 

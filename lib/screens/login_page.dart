@@ -1,14 +1,17 @@
 // ignore_for_file: use_build_context_synchronously
 
 import 'dart:math';
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:multiplayer_demo/functions/common/checkWhetherInternetConnection.dart';
 import 'package:multiplayer_demo/functions/special/adduser_to_userlist.dart';
+import 'package:multiplayer_demo/main.dart';
 import 'package:multiplayer_demo/widgets/assetimg.dart';
 import 'package:multiplayer_demo/widgets/lable.dart';
+import 'package:multiplayer_demo/widgets/special/checkinternet_connection_widget.dart';
 import 'package:multiplayer_demo/widgets/special/get_location.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:multiplayer_demo/constants/gaps.dart';
@@ -64,156 +67,167 @@ class _LoginPageState extends State<LoginPage> {
       child: Scaffold(
           backgroundColor: Colors.white,
           body: SafeArea(
-            child: Container(
-              height: double.infinity,
-              margin: const EdgeInsets.only(top: 30),
-              decoration: const BoxDecoration(
-                  color: Color.fromARGB(255, 53, 52, 52),
-                  borderRadius:
-                      // 56.borderRadiusCircular()
-                      BorderRadius.vertical(top: Radius.circular(56))),
-              child: AutofillGroup(
-                child: Column(
-                  mainAxisSize: MainAxisSize.max,
-                  children: [
-                    TextWithFontWidget.white(
-                        maxLines: 4,
-                        text:
-                            DeviceLocation.instance.currentPosition.toString()),
-                    gap20,
-                    TextWithFontWidget.black(
-                      text: "Welcome Back!",
-                      fontsize: w * 0.06,
-                      fontweight: FontWeight.w800,
-                    ).topPadding(),
-                    TextWithFontWidget(
-                      color: Colors.grey,
-                      text: "Let's log in and continue exploring.",
-                      fontsize: w * 0.04,
-                    ).bottomPadding(),
-                    title("Email").leftAlignWidget(),
-                    TextFieldBox(
-                      autofillHints: const [AutofillHints.email],
-                      controller: emailcontroller,
-                      hint: "Enter Email",
-                      prefixIcon: const Icon(
-                        Icons.email_outlined,
-                        color: Colors.black,
-                      ),
-                      emailValidatorSuffixIcon: const [
-                        Icon(
-                          Icons.check_circle,
-                          // color: tp.color.primary,
+            child: Stack(
+              fit: StackFit.expand,
+              children: [
+                Container(
+                  height: double.infinity,
+                  margin: const EdgeInsets.only(top: 30),
+                  decoration: const BoxDecoration(
+                      color: Color.fromARGB(255, 53, 52, 52),
+                      borderRadius:
+                          // 56.borderRadiusCircular()
+                          BorderRadius.vertical(top: Radius.circular(56))),
+                  child: AutofillGroup(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.max,
+                      children: [
+                        TextWithFontWidget.white(
+                            maxLines: 4,
+                            text: DeviceLocation.instance.currentPosition
+                                .toString()),
+                        gap20,
+                        TextWithFontWidget.black(
+                          text: "Welcome Back!",
+                          fontsize: w * 0.06,
+                          fontweight: FontWeight.w800,
+                        ).topPadding(),
+                        TextWithFontWidget(
+                          color: Colors.grey,
+                          text: "Let's log in and continue exploring.",
+                          fontsize: w * 0.04,
+                        ).bottomPadding(),
+                        title("Email").leftAlignWidget(),
+                        TextFieldBox(
+                          autofillHints: const [AutofillHints.email],
+                          controller: emailcontroller,
+                          hint: "Enter Email",
+                          prefixIcon: const Icon(
+                            Icons.email_outlined,
+                            color: Colors.black,
+                          ),
+                          emailValidatorSuffixIcon: const [
+                            Icon(
+                              Icons.check_circle,
+                              // color: tp.color.primary,
+                            ),
+                            Icon(Icons.check_circle_outline)
+                          ],
                         ),
-                        Icon(Icons.check_circle_outline)
-                      ],
-                    ),
-                    gap10,
-                    title("Password").leftAlignWidget(),
-                    TextFieldBox(
-                      autofillHints: const [AutofillHints.password],
-                      controller: passwordController,
-                      hint: "Enter Password",
-                      showEyeButton: true,
-                      prefixIcon: const Icon(
-                        Icons.lock_open,
-                        color: Colors.black,
-                      ),
-                    ),
-                    gap20,
-                    "Login"
-                        .roundButtonExpanded(
-                            onTap: () async {
-                              TextInput.finishAutofillContext();
-                              if (_isLoading) {
-                                return;
-                              }
-                              await _loginToFireabse(
-                                  emailcontroller.text.trim(),
-                                  passwordController.text.trim());
-                            },
-                            loading: emailLoading)
-                        .vertPadding(),
-                    "Guest Login"
-                        .roundButtonExpanded(
-                            onTap: () {
-                              _registerAnonUser(context);
-                            },
-                            loading: guestLoading)
-                        .vertPadding(),
-                    TextWithFontWidget(
-                      text: "Login with",
-                      fontsize: w * 0.04,
-                    ).vertPadding(vert: 12),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: List.generate(
-                          2,
-                          (i) => InkWell(
+                        gap10,
+                        title("Password").leftAlignWidget(),
+                        TextFieldBox(
+                          autofillHints: const [AutofillHints.password],
+                          controller: passwordController,
+                          hint: "Enter Password",
+                          showEyeButton: true,
+                          prefixIcon: const Icon(
+                            Icons.lock_open,
+                            color: Colors.black,
+                          ),
+                        ),
+                        gap20,
+                        "Login"
+                            .roundButtonExpanded(
                                 onTap: () async {
+                                  TextInput.finishAutofillContext();
                                   if (_isLoading) {
                                     return;
                                   }
-                                  switch (i) {
-                                    case 0:
-                                      signInWithGoogle();
-                                      break;
-                                    case 1:
-                                      signinwithApple();
-                                      break;
-                                    default:
-                                  }
+                                  await _loginToFireabse(
+                                      emailcontroller.text.trim(),
+                                      passwordController.text.trim());
                                 },
-                                splashColor: Colors.grey,
-                                borderRadius: 56.borderRadiusCircular(),
-                                child: Container(
-                                  width: 56,
-                                  height: 56,
-                                  decoration: BoxDecoration(
-                                      color: Colors.transparent,
-                                      shape: BoxShape.circle,
-                                      border: Border.all(
-                                          width: 2, color: Colors.grey)),
-                                  child: Center(
-                                    child: AssetImgSizeWidget(
-                                      size: 36,
-                                      img: [Images.google, Images.apple][i],
-                                    ),
-                                  ),
-                                ),
-                              )),
-                    ).opaqueWithIgnore(
-                        opacityValue: _isLoading ? 0.5 : 1, ignore: _isLoading),
-                    gap20,
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
+                                loading: emailLoading)
+                            .vertPadding(),
+                        "Guest Login"
+                            .roundButtonExpanded(
+                                onTap: () {
+                                  _registerAnonUser(context);
+                                },
+                                loading: guestLoading)
+                            .vertPadding(),
                         TextWithFontWidget(
-                          text: "Don’t have account ? ",
+                          text: "Login with",
                           fontsize: w * 0.04,
-                        ),
-                        TextButton(
-                            onPressed: () {
-                              navigateWithTransitionToScreen(
-                                  context, const SignupScreenV2());
-                            },
-                            child: TextWithFontWidget(
-                              text: "Sign Up here",
-                              fontsize: w * 0.042,
-                              // color: tp.color.appbarBG,
-                              fontweight: FontWeight.bold,
-                            ))
-                        // InkWell(
-                        //   onTap: () {
+                        ).vertPadding(vert: 12),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: List.generate(
+                              2,
+                              (i) => InkWell(
+                                    onTap: () async {
+                                      if (_isLoading) {
+                                        return;
+                                      }
+                                      switch (i) {
+                                        case 0:
+                                          signInWithGoogle();
+                                          break;
+                                        case 1:
+                                          signinwithApple();
+                                          break;
+                                        default:
+                                      }
+                                    },
+                                    splashColor: Colors.grey,
+                                    borderRadius: 56.borderRadiusCircular(),
+                                    child: Container(
+                                      width: 56,
+                                      height: 56,
+                                      decoration: BoxDecoration(
+                                          color: Colors.transparent,
+                                          shape: BoxShape.circle,
+                                          border: Border.all(
+                                              width: 2, color: Colors.grey)),
+                                      child: Center(
+                                        child: AssetImgSizeWidget(
+                                          size: 36,
+                                          img: [Images.google, Images.apple][i],
+                                        ),
+                                      ),
+                                    ),
+                                  )),
+                        ).opaqueWithIgnore(
+                            opacityValue: _isLoading ? 0.5 : 1,
+                            ignore: _isLoading),
+                        gap20,
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            TextWithFontWidget(
+                              text: "Don’t have account ? ",
+                              fontsize: w * 0.04,
+                            ),
+                            TextButton(
+                                onPressed: () {
+                                  navigateWithTransitionToScreen(
+                                      context, const SignupScreenV2());
+                                },
+                                child: TextWithFontWidget(
+                                  text: "Sign Up here",
+                                  fontsize: w * 0.042,
+                                  // color: tp.color.appbarBG,
+                                  fontweight: FontWeight.bold,
+                                ))
+                            // InkWell(
+                            //   onTap: () {
 
-                        //   },
-                        //   child: .vertPadding(),
-                        // )
+                            //   },
+                            //   child: .vertPadding(),
+                            // )
+                          ],
+                        ).verticalPadding(),
                       ],
-                    ).verticalPadding(),
-                  ],
-                ).symmetricPadding().scrollColumnWidget(),
-              ),
+                    ).symmetricPadding().scrollColumnWidget(),
+                  ),
+                ),
+                CheckInterentWidget(
+                  onRefreshPressed: () {
+                    setState(() {});
+                  },
+                )
+              ],
             ),
           )),
     );

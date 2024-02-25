@@ -100,7 +100,7 @@ class TextFieldBox extends StatelessWidget {
                   suffix: suffixIcon ?? null,
                   hintText: hint,
                   hintStyle: TextStyle(
-                      color: Theme.of(context).secondaryHeaderColor,
+                      color: Colors.grey,
                       fontSize: w * 0.045,
                       fontWeight: FontWeight.w400),
                   filled: true,
